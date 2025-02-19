@@ -73,12 +73,12 @@ pip install -r requirements.txt
 
 ### **3. Run the Training Pipeline**  
 ```bash
-python train.py
+Execute the training pipeline process within the provided notebook.
 ```
 
 ### **4. Evaluate the Model**  
 ```bash
-python evaluate.py
+Run the evaluation step inside the designated Jupyter notebook.
 ```
 
 ## **Results & Performance**  
