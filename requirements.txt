@@ -1,0 +1,10 @@
+# This file lists all the dependencies that are required by the project
+# we used python=3.10.12 for this project
+numpy
+psutil
+matplotlib
+seaborn
+absl-py
+scikit-learn
+tensorflow
+tensorflow-model-optimization
