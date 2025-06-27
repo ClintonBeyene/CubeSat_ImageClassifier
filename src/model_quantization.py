@@ -28,68 +28,26 @@ def prune_preserve_quantize_model(saved_model_path, train_dataset, val_dataset,
     """
     Loads a pruned model, applies quantization, fine-tunes it with training data, and exports
     the resulting quantization-aware model in various formats (SavedModel, HDF5, Pickle, TFLite).
-    
-    The function follows these steps:
-    
-    1. **Load and Strip Pruning:**
-       - Loads a pruned model from the provided `saved_model_path` within a custom quantization scope
-         (which registers the custom pruning wrapper).
-       - Removes the pruning wrappers using `prune.strip_pruning()`.
-       
-    2. **Quantization Annotation and Application:**
-       - Annotates the pruned model for quantization using `quantize.quantize_annotate_model()`.
-       - Applies quantization (using a default 8-bit prune-preserve quantization scheme) via 
-         `quantize.quantize_apply()`.
-       - Prints the model summary of the resulting quantization-aware model.
-       
-    3. **Quantization-Aware Fine-Tuning:**
-       - Compiles and fine-tunes the quantization-aware model on the provided `train_dataset` and `val_dataset`.
-       - Uses callbacks including:
-         - Early stopping (monitors validation loss with a patience of 5 epochs and restores the best weights).
-         - Model checkpointing (saves the best model based on validation loss).
-       - The training is performed using the helper function `compile_and_fit()`, which should be defined 
-         elsewhere in your code.
-       
-    4. **Model Evaluation and Export:**
-       - Loads the best model saved during fine-tuning (within a quantization scope) and evaluates it on 
-         `test_dataset`.
-       - Saves the best model in three formats:
-         - TensorFlow SavedModel format.
-         - HDF5 format.
-         - Pickle format (saves the model architecture as JSON and its weights).
-       - Optionally verifies the SavedModel and HDF5 formats by reloading and evaluating them on the test set.
-       
-    5. **TFLite Conversion and Evaluation:**
-       - Converts the best model to TFLite format with default optimizations.
-       - Saves the TFLite model to disk.
-       - Loads and evaluates the TFLite model on the test dataset:
-         - For each sample, inference is performed using the TFLite interpreter.
-         - Computes evaluation metrics such as accuracy, precision, recall, F1 score, and the confusion matrix.
-         
-    6. **Return:**
-       - Returns the best quantization-aware model after fine-tuning.
-    
-    Parameters:
-    -----------
-    saved_model_path : str
-        File path to the saved pruned model (with pruning wrappers) in TensorFlow format.
-    train_dataset : tf.data.Dataset
-        The training dataset used for fine-tuning the quantization-aware model.
-    val_dataset : tf.data.Dataset
-        The validation dataset for monitoring training progress and early stopping.
-    test_dataset : tf.data.Dataset
-        The test dataset used for final evaluation of the quantized model.
-    batch_size : int
-        Batch size for training and evaluation.
-    epochs : int
-        Number of training epochs for fine-tuning.
-    train_dataset_size : int
-        The total number of samples in the training dataset (used by the training function).
-    
+
+    Steps:
+        1. Loads a pruned model from the given path and strips pruning wrappers.
+        2. Annotates and applies quantization using an 8-bit prune-preserve scheme.
+        3. Fine-tunes the quantization-aware model using the provided datasets and callbacks.
+        4. Evaluates and saves the best model in TensorFlow SavedModel, HDF5, and Pickle formats.
+        5. Converts the best model to TFLite, saves, and evaluates it.
+        6. Returns the best quantization-aware model after fine-tuning.
+
+    Args:
+        saved_model_path (str): Path to the saved pruned model (with pruning wrappers).
+        train_dataset (tf.data.Dataset): Training dataset for fine-tuning.
+        val_dataset (tf.data.Dataset): Validation dataset for monitoring training.
+        test_dataset (tf.data.Dataset): Test dataset for final evaluation.
+        batch_size (int): Batch size for training and evaluation.
+        epochs (int): Number of training epochs.
+        train_dataset_size (int): Number of samples in the training dataset.
+
     Returns:
-    --------
-    best_model : tf.keras.Model
-        The best quantization-aware model obtained after fine-tuning, evaluated on the test dataset.
+        tf.keras.Model: The best quantization-aware model after fine-tuning.
     """
     
     # Load the pruned model (wrapped with custom pruning scope)
