@@ -1,3 +1,4 @@
+# Import necessary libraries
 import tensorflow as tf
 from tensorflow_model_optimization.sparsity.keras import PolynomialDecay
 from src.model_architecture import build_layerwise_model
