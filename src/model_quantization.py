@@ -1,7 +1,9 @@
+# Standard Library
+import pickle  # For saving and loading serialized model data
+
 # Third-Party Libraries
-import numpy as np
-import pickle
-from sklearn.metrics import (
+import numpy as np # For numerical operations
+from sklearn.metrics import ( # For evaluating model performance
     accuracy_score,
     precision_score,
     recall_score,
