@@ -46,15 +46,14 @@ This repository encapsulates the entire pipeline, ensuring transparency and repr
 │    ├── model_architecture.py  
 │    ├── model_training.py  
 │    ├── model_quantization.py  
-│    ├── evaluate.py  
+│    ├── evaluate.py           # Model evaluation script  
+│    ├── train.py              # Main training script
 │── 📂 scripts                 # Additional analysis and visualization scripts  
 │── 📂 notebooks               # Jupyter notebooks for development & experimentation  
 │── 📂 data                    # Dataset used for training & validation  
 │── 📂 models                  # Saved trained models  
 │── README.md                  # Project documentation  
-│── requirements.txt           # List of dependencies  
-│── train.py                   # Main training script  
-│── evaluate.py                # Model evaluation script  
+│── requirements.txt           # List of dependencies                      
 ```
 
 ## **Getting Started**  
