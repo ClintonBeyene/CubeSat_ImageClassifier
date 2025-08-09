@@ -1,0 +1,14 @@
+# .dockerignore file to optimize build context
+.git
+.gitignore
+*.ipynb
+*.pyc
+__pycache__/
+notebooks/
+scripts/
+src/
+data/
+*.zip
+*.pdf
+*.png
+cubesat/
