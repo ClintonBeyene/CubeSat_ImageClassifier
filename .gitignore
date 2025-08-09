@@ -1,2 +1,40 @@
+# Python envs and caches
 cubesat
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.env
+.venv
+
+# Data (local datasets already ignored)
 data
+
+# AWS local installers and credentials
+aws
+
+# Local debug uploads
+debug_uploads
+
+# Node build and deps (any nested frontend)
+**/node_modules/
+**/.next/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Large/binary artifacts
+*.tar
+*.tar.gz
+*.zip
+*.tflite
+*.onnx
+*.h5
+*.pb
+*.pt
+*.pth
+model/working_files/
+model/working_files.zip
