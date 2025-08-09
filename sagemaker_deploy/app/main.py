@@ -10,14 +10,17 @@ from .functions import load_tflite_model, preprocess_image, predict_class, CLASS
 
 app = FastAPI(title="CubeSat Image Classification API")
 
-# Allow CORS for frontend (adjust origin as needed)
+# Allow CORS for local dev, Vercel prod, and Vercel preview deployments
 origins = [
     "http://localhost:3000",
+    "http://localhost:3001",
+    "https://cube-sat-image-classifier.vercel.app",
 ]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_origin_regex=r"https://.*\.vercel\.app$",
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
