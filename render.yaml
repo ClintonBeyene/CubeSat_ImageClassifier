@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: cubesat-backend
+    env: docker
+    plan: free
+    autoDeploy: true
+    dockerfilePath: sagemaker_deploy/Dockerfile
+    region: frankfurt
+    rootDir: .
+    healthCheckPath: /docs
+    envVars:
+      - key: PORT
+        value: 80
+    
+    
