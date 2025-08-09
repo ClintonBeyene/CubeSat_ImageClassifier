@@ -1,0 +1,11 @@
+/* Global styles for CubeSat frontend */
+html, body {
+  padding: 0;
+  margin: 0;
+  background: #0a2342;
+  color: #fff;
+  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
