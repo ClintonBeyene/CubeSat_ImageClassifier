@@ -1,0 +1,6 @@
+# This file lists only the dependencies required for the FastAPI TFLite inference API
+fastapi==0.111.0
+uvicorn[standard]
+numpy==1.26.4
+tensorflow
+pillow
