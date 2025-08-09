@@ -42,3 +42,17 @@ def preprocess_image(image_bytes, target_size=(128, 128)):
         raise ValueError(f"Preprocessed shape {arr.shape[1:3]} != expected {(req_h, req_w)}")
     print(f"[PREP] shape={arr.shape} range=({arr.min():.4f},{arr.max():.4f})")
     return arr
+
+def predict_class(interpreter, image_arr):
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+    expected = tuple(input_details[0]['shape'])
+    if image_arr.shape != expected:
+        raise ValueError(f"Batch shape {image_arr.shape} != model expected {expected}")
+    interpreter.set_tensor(input_details[0]['index'], image_arr)
+    interpreter.invoke()
+    output = interpreter.get_tensor(output_details[0]['index'])
+    print(f"[RAW OUTPUT] {output}")
+    pred_idx = int(np.argmax(output))
+    prob = float(np.max(output))
+    return pred_idx, prob
