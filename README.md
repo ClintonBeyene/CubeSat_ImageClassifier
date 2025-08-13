@@ -40,20 +40,25 @@ This repository encapsulates the entire pipeline, ensuring transparency and repr
 ## **Repository Structure**  
 
 ```
-📂 CubeSat_ImageClassify  
-│── 📂 src                     # Core scripts for preprocessing, training, and evaluation  
-│    ├── data_preprocessing.py  
-│    ├── model_architecture.py  
-│    ├── model_training.py  
-│    ├── model_quantization.py  
-│    ├── evaluate.py           # Model evaluation script  
-│    ├── train.py              # Main training script
-│── 📂 scripts                 # Additional analysis and visualization scripts  
-│── 📂 notebooks               # Jupyter notebooks for development & experimentation  
-│── 📂 data                    # Dataset used for training & validation  
-│── 📂 models                  # Saved trained models  
-│── README.md                  # Project documentation  
-│── requirements.txt           # List of dependencies                      
+📂 CubeSat_ImageClassifier
+│── 📂 sagemaker_deploy            # Backend API (FastAPI) + Dockerfile
+│   ├── app/
+│   │   ├── main.py               # FastAPI app (POST /predict)
+│   │   └── functions.py          # TFLite load, preprocess, inference
+│   ├── Dockerfile                # Backend container image
+│   └── requirements.txt         # API dependencies
+│── 📂 frontend                   # Next.js (UI)
+│   ├── pages/                    # index.tsx, _app.tsx, etc.
+│   ├── components/               # Starfield, etc.
+│   ├── styles/                   # CSS modules
+│   ├── package.json
+│   └── .env.example              # Public API URL (NEXT_PUBLIC_API_URL)
+│── render.yaml                   # Render blueprint for backend deployment
+│── Cubenet_Best_Quantized.tflite # Quantized TFLite model used by API
+│── 📂 data                       # NPY datasets (ignored in VCS as needed)
+│── 📂 notebooks                  # Experimentation notebooks
+│── 📂 scripts / 📂 src            # Training/eval utilities
+│── README.md                     # This file
 ```
 
 ## **Getting Started**  
@@ -61,24 +66,30 @@ This repository encapsulates the entire pipeline, ensuring transparency and repr
 ### **1. Clone the Repository**  
 ```bash
 git clone https://github.com/ClintonBeyene/CubeSat_ImageClassifier
-cd CubeSat_ImageClassify
+cd CubeSat_ImageClassifier
 ```
 
-### **2. Install Dependencies**  
-Ensure you have Python installed, then run:  
+### **2. Run the Backend API (FastAPI)**
+Install API dependencies and start the server locally:
 ```bash
-pip install -r requirements.txt
+pip install -r sagemaker_deploy/requirements.txt
+uvicorn sagemaker_deploy.app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### **3. Run the Training Pipeline**  
-```bash
-Execute the training pipeline process within the provided notebook.
-```
+Open API docs: http://localhost:8000/docs
 
-### **4. Evaluate the Model**  
+### **3. Run the Frontend (Next.js)**
+From `frontend/`:
 ```bash
-Run the evaluation step inside the designated Jupyter notebook.
+copy .env.example .env
+# edit .env to point NEXT_PUBLIC_API_URL to your backend (e.g., http://localhost:8000/predict)
+npm install
+npm run dev
 ```
+Visit UI: http://localhost:3000
+
+### **4. Train & Evaluate (optional)**
+Use the provided notebooks under `notebooks/` to run training/evaluation. Any Python utilities reside under `src/` and `scripts/`.
 
 ## **Results & Performance**  
 
@@ -89,3 +100,78 @@ Our optimized model achieves **high classification accuracy while maintaining co
 We acknowledge the **Kyushu Institute of Technology (Kyutech)** and the **Hack4Dev CubeSat Challenge** for providing the dataset and problem statement.  
 
 ---  
+
+## Deployment & Operations
+
+### Backend: Docker
+
+Recommended build (uses Dockerfile under `sagemaker_deploy/` and repo root as context):
+
+```bash
+docker build -f sagemaker_deploy/Dockerfile -t cubesat-image-api:latest . --provenance=false --output type=docker
+```
+
+Your requested command (equivalent if run from repo root):
+
+```bash
+docker build -t cubesat-image-api:latest . --provenance=false --output type=docker
+```
+
+Run locally:
+
+```bash
+docker run --rm -p 8080:80 cubesat-image-api:latest
+# API now at http://localhost:8080/docs and POST /predict
+```
+
+Push to Docker Hub:
+
+```bash
+docker tag cubesat-image-api:latest <your-dockerhub-username>/cubesat-image-api:latest
+docker push <your-dockerhub-username>/cubesat-image-api:latest
+```
+
+### Backend: Render (already configured)
+
+- Infra file: `render.yaml` (env: docker, healthCheckPath: /docs, region: frankfurt)
+- Dockerfile: `sagemaker_deploy/Dockerfile`
+- Model file is included in the image as `Cubenet_Best_Quantized.tflite`
+
+### Frontend: Vercel
+
+- Root: `frontend/`
+- Env var: `NEXT_PUBLIC_API_URL` must point to your backend `/predict`
+- Build: `npm run build`; Start: `npm start`
+
+### Optional: AWS ECS (Fargate) from Docker Hub image
+
+High-level steps:
+- Create a task definition (Fargate) exposing container port 80
+- Use image `<your-dockerhub-username>/cubesat-image-api:latest`
+- Service: 1+ tasks in a public subnet with an ALB or a public IP
+- Health check path: `/docs`
+- Security group: allow inbound 80/443 from the internet
+
+## API Reference
+
+- POST `/predict`
+  - Request: `multipart/form-data` with field `file` (image/*)
+  - Response JSON:
+    - `predicted_class`: string
+    - `class_index`: integer
+    - `probability`: float (0..1)
+
+## Environment Variables
+
+- Frontend (`frontend/.env`)
+  - `NEXT_PUBLIC_API_URL` — full backend URL including `/predict`
+    - Example: `https://cubesat-backend.onrender.com/predict`
+
+## Roadmap / Tasks
+
+- [ ] Create Search API with Fast API
+- [ ] Create Docker Image for API — “docker build -t cubesat-image-api:latest . --provenance=false --output type=docker”
+- [ ] Push Image to Docker HUB
+- [ ] Deploy Container on AWS ECS
+- [ ] Build the app and deployment
+
