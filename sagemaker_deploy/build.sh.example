@@ -2,9 +2,9 @@
 # Build script to create SageMaker-compatible Docker image
 
 # Set variables
-IMAGE_NAME="cubesat-tflite-inference"
-ECR_REPO="456202168010.dkr.ecr.us-east-1.amazonaws.com/cubesat-tflite-inference"
-REGION="us-east-1"
+IMAGE_NAME="<IMAGE_NAME>"
+ECR_REPO="<AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/<REPO_NAME>"
+REGION="<REGION>"
 
 # Build with Docker format (not OCI)
 echo "Building Docker image with Docker format..."
